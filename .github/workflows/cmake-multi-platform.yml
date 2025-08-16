@@ -150,3 +150,10 @@ jobs:
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: timeout 600 ctest --build-config RelWithDebInfo --output-on-failure
+
+    - name: Upload resulting .clap plugin
+      uses: actions/upload-artifact@v4
+      with:
+        name: plugin-clap.clap
+        path: ${{ steps.strings.outputs.build-output-dir }}/src/plugin-clap/plugin-clap.clap
+        retention-days: 3
