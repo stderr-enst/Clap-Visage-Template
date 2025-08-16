@@ -8,7 +8,6 @@ FetchContent_Declare(
   EXCLUDE_FROM_ALL
 )
 FetchContent_MakeAvailable(visage)
-# target_include_directories(visage SYSTEM PRIVATE ${VISAGE_INCLUDE_DIR})
 
 FetchContent_Declare(
   clap
@@ -18,7 +17,6 @@ FetchContent_Declare(
   EXCLUDE_FROM_ALL
 )
 FetchContent_MakeAvailable(clap)
-# target_include_directories(clap SYSTEM PRIVATE ${CLAP_INCLUDE_DIR})
 
 FetchContent_Declare(
   clap_helpers
