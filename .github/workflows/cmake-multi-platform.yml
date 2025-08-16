@@ -4,9 +4,9 @@ name: CMake on multiple platforms
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, githubactions ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, githubactions ]
 
 jobs:
   build:
@@ -22,13 +22,17 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         build_type: [Debug, Release]
         c_compiler: [clang, cl]
         include:
           - os: windows-latest
             c_compiler: cl
             cpp_compiler: cl
+            build_type: Release
+          - os: macos-latest
+            c_compiler: clang
+            cpp_compiler: clang++
             build_type: Release
           - os: ubuntu-latest
             c_compiler: clang
@@ -54,9 +58,31 @@ jobs:
           - os: ubuntu-latest
             c_compiler: cl
             build_type: Release
+          - os: macos-latest
+            c_compiler: clang
+            build_type: Debug
+          - os: macos-latest
+            c_compiler: cl
+            build_type: Debug
+          - os: macos-latest
+            c_compiler: cl
+            build_type: Release
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Install dependencies (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+        libx11-dev \
+        libxext-dev \
+        libxrandr-dev \
+        libxinerama-dev \
+        libxcursor-dev \
+        libxi-dev \
+        xvfb
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
