@@ -131,6 +131,21 @@ jobs:
         sanitizers: [-fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer,-fsanitize=memory,-fsanitize=thread]
     steps:
     - uses: actions/checkout@v4
+
+    - name: Install dependencies (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+        libx11-dev \
+        libxext-dev \
+        libxrandr-dev \
+        libxinerama-dev \
+        libxcursor-dev \
+        libxi-dev \
+        libgl1-mesa-dev \
+        xvfb
+
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
       id: strings
