@@ -1,13 +1,6 @@
-add_library(adapters)
-target_sources(adapters
-  PUBLIC
-    FILE_SET HEADERS
-    BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
-    FILES
-      parameter.h
-)
+add_library(adapters INTERFACE)
 target_include_directories(adapters
-  PUBLIC
+  INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}
 )
 set_target_properties(adapters PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_ARGS}" LINKER_LANGUAGE CXX)

@@ -1,19 +1,12 @@
-add_library(gui)
-target_sources(gui
-  PUBLIC
-    FILE_SET HEADERS
-    BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
-    FILES
-      gui.h
-)
+add_library(gui INTERFACE)
 target_include_directories(gui
-  PUBLIC
+  INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}
 )
 set_target_properties(gui PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_ARGS}" LINKER_LANGUAGE CXX)
 
 target_link_libraries(gui
-  PUBLIC
+  INTERFACE
     adapters
 
     visage
