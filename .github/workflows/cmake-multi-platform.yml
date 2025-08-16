@@ -82,6 +82,7 @@ jobs:
         libxinerama-dev \
         libxcursor-dev \
         libxi-dev \
+        libgl1-mesa-dev \
         xvfb
 
     - name: Set reusable strings
