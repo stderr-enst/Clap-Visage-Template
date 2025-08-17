@@ -150,6 +150,13 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest --build-config ${{ matrix.build_type }} --output-on-failure
 
+    - name: Run clap validator on plugin
+      if: runner.os == 'Linux' && matrix.build_type == 'Release'
+      run: |
+        wget https://github.com/free-audio/clap-validator/releases/download/0.3.2/clap-validator-0.3.2-ubuntu-18.04.tar.gz && \
+        tar xfz clap-validator-0.3.2-ubuntu-18.04.tar.gz && \
+        ./clap-validator validate ${{ steps.strings.outputs.build-output-dir }}/src/plugin-clap/plugin-clap.clap
+
     - name: Upload resulting .clap plugin
       if: runner.os != 'Windows'
       uses: actions/upload-artifact@v4
