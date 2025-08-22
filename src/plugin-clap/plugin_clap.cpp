@@ -13,6 +13,7 @@ static constexpr const char *const kClapFeatures[] = {
   nullptr
 };
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 clap_plugin_descriptor ClapPlugin::descriptor = {
   .clap_version = CLAP_VERSION,
   .id = "dev.jorchime.mge",

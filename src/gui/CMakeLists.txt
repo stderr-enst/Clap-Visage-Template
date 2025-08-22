@@ -1,4 +1,9 @@
-add_library(gui INTERFACE)
+add_library(gui
+  STATIC
+    gui.h
+    Lato-Regular.h
+    Lato-Regular.cpp
+)
 target_include_directories(gui
   INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}
