@@ -67,13 +67,14 @@ public:
       return;
 
     if (e.repeatClickCount() >= 2){
-      rotation = 0.5;
+      setRotation(0.5);
       changed = true;
 
       return;
     }
 
     last_drag = e.position.y;
+    redraw();
   }
 
   void mouseUp(const visage::MouseEvent& e) override {
@@ -88,6 +89,7 @@ public:
     setRotation(rotation + delta);
 
     changed = true;
+    redraw();
   }
 
   void mouseEnter(const visage::MouseEvent& e) override {
@@ -105,6 +107,7 @@ public:
     setRotation(rotation + delta);
 
     changed = true;
+    redraw();
 
     return true;
   }
