@@ -46,7 +46,6 @@ TEST_CASE("ParameterList basics") {
             CHECK(id == newid);
             auto newid2 = pl.getParameterId("Testparameter2");
             CHECK(id2 == newid2);
-
             auto newid3 = pl.getParameterId("Doesn't exist");
             CHECK(!newid3.has_value());
         }
@@ -55,65 +54,112 @@ TEST_CASE("ParameterList basics") {
     SUBCASE("Value initializes to default"){
         REQUIRE(p.value != doctest::Approx(p.default_value));
 
-        double value = pl.getParameterValue(id);
-        double default_value = pl.getParameterDefault(id);
+        auto value = pl.getParameterValue(id);
+        REQUIRE( value.has_value() );
+        auto default_value = pl.getParameterDefault(id);
+        REQUIRE( default_value.has_value() );
 
-        CHECK(value == doctest::Approx(default_value));
+        CHECK(value.value_or(0.0) == doctest::Approx(default_value.value_or(0.8)));
     }
 
-    SUBCASE("getters"){
-        std::string name = pl.getParameterName(id);
-        double value = pl.getParameterValue(id);
-        double min_value = pl.getParameterMin(id);
-        double max_value = pl.getParameterMax(id);
-        double default_value = pl.getParameterDefault(id);
+    SUBCASE("getters by ID"){
+        auto name = pl.getParameterName(id);
+        REQUIRE( name.has_value() );
+        auto value = pl.getParameterValue(id);
+        REQUIRE( value.has_value() );
+        auto min_value = pl.getParameterMin(id);
+        REQUIRE( min_value.has_value() );
+        auto max_value = pl.getParameterMax(id);
+        REQUIRE( max_value.has_value() );
+        auto default_value = pl.getParameterDefault(id);
+        REQUIRE( default_value.has_value() );
 
-        CHECK(name == p.name);
-        CHECK(value == doctest::Approx(p.default_value)); // init to default
-        CHECK(min_value == doctest::Approx(p.min_value));
-        CHECK(max_value == doctest::Approx(p.max_value));
-        CHECK(default_value == doctest::Approx(p.default_value));
+        CHECK(name.value_or("") == p.name);
+        CHECK(value.value_or(0.0) == doctest::Approx(p.default_value)); // init to default
+        CHECK(min_value.value_or(1.0) == doctest::Approx(p.min_value));
+        CHECK(max_value.value_or(0.0) == doctest::Approx(p.max_value));
+        CHECK(default_value.value_or(0.0) == doctest::Approx(p.default_value));
+    }
+
+    SUBCASE("getters by name"){
+        const std::string name{"Testparameter"};
+        auto checkid = pl.getParameterId(name);
+        REQUIRE( checkid.has_value() );
+        auto value = pl.getParameterValue(name);
+        REQUIRE( value.has_value() );
+        auto min_value = pl.getParameterMin(name);
+        REQUIRE( min_value.has_value() );
+        auto max_value = pl.getParameterMax(name);
+        REQUIRE( max_value.has_value() );
+        auto default_value = pl.getParameterDefault(name);
+        REQUIRE( default_value.has_value() );
+
+        CHECK(checkid.value_or(3) == p.id);
+        CHECK(value.value_or(0.0) == doctest::Approx(p.default_value)); // init to default
+        CHECK(min_value.value_or(1.0) == doctest::Approx(p.min_value));
+        CHECK(max_value.value_or(0.0) == doctest::Approx(p.max_value));
+        CHECK(default_value.value_or(0.0) == doctest::Approx(p.default_value));
     }
 
     SUBCASE("setParameterValue clamps to min"){
-        double min_value = pl.getParameterMin(id);
-        REQUIRE(min_value == doctest::Approx(0.0));
+        auto min_value = pl.getParameterMin(id);
+        REQUIRE(min_value.value_or(1.0) == doctest::Approx(0.0));
 
         pl.setParameterValue(id, -0.3);
-        double value = pl.getParameterValue(id);
-        CHECK(value > doctest::Approx(-0.3));
-        CHECK(value == doctest::Approx(min_value));
+        auto value = pl.getParameterValue(id);
+        CHECK(value.value_or(0.0) > doctest::Approx(-0.3));
+        CHECK(value.value_or(0.0) == doctest::Approx(min_value.value_or(1.0)));
     }
 
     SUBCASE("setParameterValue clamps to max"){
-        double max_value = pl.getParameterMax(id);
-        REQUIRE(max_value == doctest::Approx(1.0));
+        auto max_value = pl.getParameterMax(id);
+        REQUIRE(max_value.value_or(0.0) == doctest::Approx(1.0));
 
         pl.setParameterValue(id, 1.2);
-        double value = pl.getParameterValue(id);
-        CHECK(value < doctest::Approx(1.2));
-        CHECK(value == doctest::Approx(max_value));
+        auto value = pl.getParameterValue(id);
+        CHECK(value.value_or(0.0) < doctest::Approx(1.2));
+        CHECK(value.value_or(1.0) == doctest::Approx(max_value.value_or(0.0)));
     }
 
-    SUBCASE("Other setters"){
-        REQUIRE(pl.getParameterName(id) == "Testparameter");
+    SUBCASE("Remaining setters by ID"){
+        REQUIRE(pl.getParameterName(id).value_or("") == "Testparameter");
         pl.setParameterName(id, "Testparameter2");
-        CHECK(pl.getParameterName(id) == "Testparameter2");
+        CHECK(pl.getParameterName(id).value_or("") == "Testparameter2");
 
-        REQUIRE(pl.getParameterMin(id) == doctest::Approx(0.0));
+        REQUIRE(pl.getParameterMin(id).value_or(1.0) == doctest::Approx(0.0));
         pl.setParameterMin(id, 0.1);
-        CHECK(pl.getParameterMin(id) == doctest::Approx(0.1));
+        CHECK(pl.getParameterMin(id).value_or(1.0) == doctest::Approx(0.1));
 
-        REQUIRE(pl.getParameterMax(id) == doctest::Approx(1.0));
+        REQUIRE(pl.getParameterMax(id).value_or(0.0) == doctest::Approx(1.0));
         pl.setParameterMax(id, 1.2);
-        CHECK(pl.getParameterMax(id) == doctest::Approx(1.2));
+        CHECK(pl.getParameterMax(id).value_or(0.0) == doctest::Approx(1.2));
 
-        REQUIRE(pl.getParameterDefault(id) == doctest::Approx(0.8));
+        REQUIRE(pl.getParameterDefault(id).value_or(0.0) == doctest::Approx(0.8));
         pl.setParameterDefault(id, 0.3);
-        CHECK(pl.getParameterDefault(id) == doctest::Approx(0.3));
+        CHECK(pl.getParameterDefault(id).value_or(0.0) == doctest::Approx(0.3));
 
-        REQUIRE(pl.getParameterValue(id) == doctest::Approx(0.8));
+        REQUIRE(pl.getParameterValue(id).value_or(0.0) == doctest::Approx(0.8));
         pl.setParameterToDefault(id);
-        CHECK(pl.getParameterValue(id) == doctest::Approx(pl.getParameterDefault(id)));
+        CHECK(pl.getParameterValue(id).value_or(0.0) == doctest::Approx(pl.getParameterDefault(id).value_or(0.8)));
+    }
+
+    SUBCASE("Remaining setters by name"){
+        const std::string name{"Testparameter"};
+
+        REQUIRE(pl.getParameterValue(name).value_or(0.0) != doctest::Approx(0.3));
+        pl.setParameterValue(name, 0.3);
+        CHECK(pl.getParameterValue(name).value_or(0.0) == doctest::Approx(0.3));
+
+        REQUIRE(pl.getParameterMin(name).value_or(1.0) == doctest::Approx(0.0));
+        pl.setParameterMin(name, 0.1);
+        CHECK(pl.getParameterMin(name).value_or(0.0) == doctest::Approx(0.1));
+
+        REQUIRE(pl.getParameterMax(name).value_or(0.0) == doctest::Approx(1.0));
+        pl.setParameterMax(name, 1.2);
+        CHECK(pl.getParameterMax(name).value_or(0.0) == doctest::Approx(1.2));
+
+        REQUIRE(pl.getParameterDefault(name).value_or(0.0) == doctest::Approx(0.8));
+        pl.setParameterDefault(name, 0.3);
+        CHECK(pl.getParameterDefault(name).value_or(0.0) == doctest::Approx(0.3));
     }
 }

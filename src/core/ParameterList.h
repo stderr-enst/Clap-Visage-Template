@@ -39,7 +39,7 @@ public:
         return nextid;
     }
 
-    std::optional<const unsigned int> getParameterId(const std::string lookup) const {
+    std::optional<const unsigned int> getParameterId(const std::string& lookup) const {
         if (nameToId.contains(lookup)) {
             return nameToId.at(lookup);
         }
@@ -47,44 +47,80 @@ public:
         return {};
     }
 
-    const std::string getParameterName(const unsigned int id) const {
+    std::optional<const std::string> getParameterName(const unsigned int id) const {
         if (idInParameters(id)) {
             return parameters[id].name;
         }
 
-        return std::string("");
+        return {};
     }
 
-    const T getParameterValue(const unsigned int id) const {
+    std::optional<const T> getParameterValue(const unsigned int id) const {
         if (idInParameters(id)) {
             return parameters[id].value;
         }
 
-        return T{0};
+        return {};
     }
 
-    const T getParameterMin(const unsigned int id) const {
+    std::optional<const T> getParameterValue(const std::string& lookup) const {
+        auto idoptional = getParameterId(lookup);
+        if (idoptional) {
+            return getParameterValue(idoptional.value());
+        }
+
+        return {};
+    }
+
+    std::optional<const T> getParameterMin(const unsigned int id) const {
         if (idInParameters(id)) {
             return parameters[id].min_value;
         }
 
-        return T{0};
+        return {};
     }
 
-    const T getParameterMax(const unsigned int id) const {
+    std::optional<const T> getParameterMin(const std::string& lookup) const {
+        auto idoptional = getParameterId(lookup);
+        if (idoptional) {
+            return getParameterMin(idoptional.value());
+        }
+
+        return {};
+    }
+
+    std::optional<const T> getParameterMax(const unsigned int id) const {
         if (idInParameters(id)) {
             return parameters[id].max_value;
         }
 
-        return T{0};
+        return {};
     }
 
-    const T getParameterDefault(const unsigned int id) const {
+    std::optional<const T> getParameterMax(const std::string& lookup) const {
+        auto idoptional = getParameterId(lookup);
+        if (idoptional) {
+            return getParameterMax(idoptional.value());
+        }
+
+        return {};
+    }
+
+    std::optional<const T> getParameterDefault(const unsigned int id) const {
         if (idInParameters(id)) {
             return parameters[id].default_value;
         }
 
-        return T{0};
+        return {};
+    }
+
+    std::optional<const T> getParameterDefault(const std::string& lookup) const {
+        auto idoptional = getParameterId(lookup);
+        if (idoptional) {
+            return getParameterDefault(idoptional.value());
+        }
+
+        return {};
     }
 
     void setParameterName(const unsigned int id, const std::string newname) {
@@ -100,9 +136,23 @@ public:
         }
     }
 
+    void setParameterValue(const std::string& lookup, const T& newvalue) {
+        auto idoptional = getParameterId(lookup);
+        if (idoptional) {
+            setParameterValue(idoptional.value(), newvalue);
+        }
+    }
+
     void setParameterMin(const unsigned int id, const T& newmin) {
         if (idInParameters(id)) {
             parameters[id].min_value = newmin;
+        }
+    }
+
+    void setParameterMin(const std::string& lookup, const T& newvalue) {
+        auto idoptional = getParameterId(lookup);
+        if (idoptional) {
+            setParameterMin(idoptional.value(), newvalue);
         }
     }
 
@@ -112,9 +162,23 @@ public:
         }
     }
 
+    void setParameterMax(const std::string& lookup, const T& newvalue) {
+        auto idoptional = getParameterId(lookup);
+        if (idoptional) {
+            setParameterMax(idoptional.value(), newvalue);
+        }
+    }
+
     void setParameterDefault(const unsigned int id, const T& newdefault) {
         if (idInParameters(id)) {
             parameters[id].default_value = newdefault;
+        }
+    }
+
+    void setParameterDefault(const std::string& lookup, const T& newvalue) {
+        auto idoptional = getParameterId(lookup);
+        if (idoptional) {
+            setParameterDefault(idoptional.value(), newvalue);
         }
     }
 
