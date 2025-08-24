@@ -1,14 +1,22 @@
 #ifndef PARAMETERLIST_H
 #define PARAMETERLIST_H
 
-#include "Parameter.h"
-
 #include <algorithm>
 #include <concepts>
 #include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+template<typename T>
+struct Parameter {
+    unsigned int id{};
+    std::string name{};
+    T min_value{};
+    T max_value{};
+    T default_value{};
+    T value{};
+};
 
 template<typename T> requires std::totally_ordered<T>
 class ParameterList {
@@ -54,6 +62,24 @@ public:
 
         return {};
     }
+
+    std::optional<const Parameter<T>* const> getParameter(const unsigned int id) const {
+        if (idInParameters(id)) {
+            return &parameters[id];
+        }
+
+        return {};
+    }
+
+    std::optional<const Parameter<T>* const> getParameter(const std::string& lookup) const {
+        auto idoptional = getParameterId(lookup);
+        if (idoptional) {
+            return getParameter(idoptional.value());
+        }
+
+        return {};
+    }
+
 
     std::optional<const T> getParameterValue(const unsigned int id) const {
         if (idInParameters(id)) {

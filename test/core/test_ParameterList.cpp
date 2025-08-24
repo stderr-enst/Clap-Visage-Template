@@ -1,6 +1,5 @@
 #include "doctest/doctest.h"
 
-#include "Parameter.h"
 #include "ParameterList.h"
 
 #include <string>
@@ -141,6 +140,18 @@ TEST_CASE("ParameterList basics") {
         REQUIRE(pl.getParameterValue(id).value_or(0.0) == doctest::Approx(0.8));
         pl.setParameterToDefault(id);
         CHECK(pl.getParameterValue(id).value_or(0.0) == doctest::Approx(pl.getParameterDefault(id).value_or(0.8)));
+
+        auto paramObject = pl.getParameter(id);
+        if (paramObject.has_value()) {
+            CHECK(paramObject.value()->id == 0);
+            CHECK(paramObject.value()->name == "Testparameter2");
+            CHECK(paramObject.value()->min_value == doctest::Approx(0.1));
+            CHECK(paramObject.value()->max_value == doctest::Approx(1.2));
+            CHECK(paramObject.value()->default_value == doctest::Approx(0.3));
+            CHECK(paramObject.value()->value == doctest::Approx(0.3));
+        } else {
+            REQUIRE(false);
+        }
     }
 
     SUBCASE("Remaining setters by name"){
@@ -161,5 +172,17 @@ TEST_CASE("ParameterList basics") {
         REQUIRE(pl.getParameterDefault(name).value_or(0.0) == doctest::Approx(0.8));
         pl.setParameterDefault(name, 0.3);
         CHECK(pl.getParameterDefault(name).value_or(0.0) == doctest::Approx(0.3));
+
+        auto paramObject = pl.getParameter(name);
+        if (paramObject.has_value()) {
+            CHECK(paramObject.value()->id == 0);
+            CHECK(paramObject.value()->name == "Testparameter.");
+            CHECK(paramObject.value()->min_value == doctest::.Approx(0.1));
+            CHECK(paramObject.value()->max_value == doctest::.Approx(1.2));
+            CHECK(paramObject.value()->default_value == docte.st::Approx(0.3));
+            CHECK(paramObject.value()->value == doctest::Appr.ox(0.3));
+        } else {                                             .
+            REQUIRE(false);
+        }
     }
 }
