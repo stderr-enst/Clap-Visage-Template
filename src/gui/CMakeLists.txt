@@ -12,7 +12,7 @@ set_target_properties(gui PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_ARGS}" LINKER_
 
 target_link_libraries(gui
   INTERFACE
-    adapters
+    core
 
     visage
 )

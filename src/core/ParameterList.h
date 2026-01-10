@@ -1,6 +1,8 @@
 #ifndef PARAMETERLIST_H
 #define PARAMETERLIST_H
 
+#include "IParameterView.h"
+
 #include <algorithm>
 #include <concepts>
 #include <optional>
@@ -43,6 +45,7 @@ public:
         };
         parameters.emplace_back(newparam);
         nameToId.emplace(newname, nextid);
+        views.emplace(newparam.id, std::vector<IParameterView<T>*>{});
 
         return nextid;
     }
@@ -214,6 +217,43 @@ public:
         }
     }
 
+    unsigned int size() {
+        return parameters.size();
+    }
+
+    void registerView(const std::string& lookup , IParameterView<T>* view) {
+        auto idoptional = getParameterId(lookup);
+        if (idoptional) {
+            registerView(idoptional.value(), view);
+        }
+    }
+
+    void registerView(unsigned int id, IParameterView<T>* view) {
+        if (view != nullptr) {
+            views[id].push_back(view);
+        }
+
+        updateViews(id);
+    }
+
+    void updateViews(unsigned int id) {
+        for (auto view : views[id]) {
+            if (view != nullptr) {
+                view->setView(parameters[id].value);
+            }
+        }
+    }
+
+    void updateAllViews() {
+        for (auto param : parameters) {
+            for (auto view : views[param.id]) {
+                if (view != nullptr) {
+                    view->setView(param.value);
+                }
+            }
+        }
+    }
+
 private:
     bool idInParameters(const unsigned int id) const {
         return id < parameters.size();
@@ -221,6 +261,7 @@ private:
 
     std::unordered_map<std::string, unsigned int> nameToId{};
     std::vector<Parameter<T>> parameters{};
+    std::unordered_map<unsigned int, std::vector<IParameterView<T>*>> views;
 };
 
 #endif // PARAMETERLIST_H

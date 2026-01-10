@@ -33,20 +33,16 @@ ClapPlugin::ClapPlugin(const clap_host* host) : ClapPluginBase(&descriptor, host
 ClapPlugin::~ClapPlugin() = default;
 
 bool ClapPlugin::init() noexcept {
-  // Manage parameters from CLAPs perspective
-  // GUI parameters are handled in guiCreate and also use the ParameterModel's
-  // in parameters as their data
-  Parameter<double> p {
-    .id = 0,
-    .name = "Gain man!",
-    .min_value = 0.0,
-    .max_value = 1.0,
-    .default_value = 0.8,
-    .value = 0.8
-  };
-  parameters.emplace_back(p);
-  paramviews.push_back(std::make_unique<PlugParamView>());
-  parameters[0].registerView(paramviews[0].get());
+  parameters = std::make_unique<ParameterList<double>>();
+
+  // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
+  auto id = parameters->createParameter(
+    "Gain man!",
+     0.0,
+     1.0,
+     0.8);
+  parameterPresenters.emplace(id, std::make_unique<ClapParameterPresenter>());
+  parameters->registerView(id, parameterPresenters[id].get());
 
   return true;
 }
@@ -72,11 +68,13 @@ bool ClapPlugin::audioPortsInfo(uint32_t index, bool isInput, clap_audio_port_in
 }
 
 bool ClapPlugin::paramsInfo(uint32_t paramIndex, clap_param_info* info) const noexcept {
-  if (paramIndex < parameters.size()) {
-    const auto p = parameters[paramIndex].getParameter();
+  auto poptional = parameters->getParameter(paramIndex);
+  if (poptional.has_value()) {
+    const Parameter<double>* const p = poptional.value();
     info->id = p->id;
+    // Don't copy last character to guarantee null-termination
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
-    strncpy(info->name, p->name.c_str(), sizeof(info->name));
+    p->name.copy(info->name, sizeof(info->name)-1);
     info->min_value = p->min_value;
     info->max_value = p->max_value;
     info->default_value = p->default_value;
@@ -88,8 +86,8 @@ bool ClapPlugin::paramsInfo(uint32_t paramIndex, clap_param_info* info) const no
 }
 
 bool ClapPlugin::paramsValue(clap_id paramId, double* value) noexcept {
-  if(paramId < paramviews.size()) {
-    *value = paramviews[paramId]->getDisplayValue();
+  if(paramId < parameterPresenters.size()) {
+    *value = parameterPresenters[paramId]->getDisplayValue();
     return true;
   } else {
     return false;
@@ -99,8 +97,8 @@ bool ClapPlugin::paramsValue(clap_id paramId, double* value) noexcept {
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 bool ClapPlugin::paramsValueToText(clap_id paramId, double value, char* display, uint32_t size) noexcept {
   std::string text = std::to_string(value);
-  auto newchars = text.c_str();
-  strncpy(display, newchars, sizeof(char)*size);
+  // Don't copy last character to guarantee null-termination
+  text.copy(display, sizeof(char)*size - 1);
   return true;
 }
 
@@ -132,7 +130,7 @@ clap_process_status ClapPlugin::process(const clap_process *process) noexcept {
       if (event->space_id == CLAP_CORE_EVENT_SPACE_ID && event->type == CLAP_EVENT_PARAM_VALUE) {
        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
        auto* valueEvent = reinterpret_cast<const clap_event_param_value_t*>(event);
-       parameters[valueEvent->param_id].setModel(valueEvent->value);
+       parameters->setParameterValue(valueEvent->param_id, valueEvent->value);
      }
 
       eventIndex++;

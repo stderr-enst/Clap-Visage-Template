@@ -78,7 +78,7 @@ bool ClapPlugin::guiCreate(const char* api, bool is_floating) noexcept {
   app_ = std::make_unique<MyGui>();
 
   // Register Knob-view to gain parameter
-  parameters[0].registerView(app_->getKnob());
+  parameters->registerView("Gain man!", app_->getKnob());
 
   app_->onWindowContentsResized() = [this] { _host.guiRequestResize(pluginWidth(), pluginHeight()); };
 
@@ -160,7 +160,7 @@ void ClapPlugin::updateParametersFromGui(const clap_process *process) noexcept {
 
   if( app_ != nullptr ) {
     if ( app_->getKnob()->isChanged() ){
-      parameters[0].setModel(app_->getKnob()->getRotation());
+      parameters->setParameterValue(0, app_->getKnob()->getRotation());
       app_->getKnob()->unsetChanged();
 
       clap_event_param_value_t event = {};
@@ -175,13 +175,11 @@ void ClapPlugin::updateParametersFromGui(const clap_process *process) noexcept {
       event.port_index = -1;
       event.channel = -1;
       event.key = -1;
-      event.value = parameters[event.param_id].getParameter()->value;
+      event.value = parameters->getParameterValue(event.param_id).value_or(0.0);
       process->out_events->try_push(process->out_events, &event.header);
     } else {
       // synchronize all views to update Gui elements
-      for(auto& param : parameters){
-        param.updateViews();
-      }
+      parameters->updateAllViews();
     }
   }
 }

@@ -176,12 +176,12 @@ TEST_CASE("ParameterList basics") {
         auto paramObject = pl.getParameter(name);
         if (paramObject.has_value()) {
             CHECK(paramObject.value()->id == 0);
-            CHECK(paramObject.value()->name == "Testparameter.");
-            CHECK(paramObject.value()->min_value == doctest::.Approx(0.1));
-            CHECK(paramObject.value()->max_value == doctest::.Approx(1.2));
-            CHECK(paramObject.value()->default_value == docte.st::Approx(0.3));
-            CHECK(paramObject.value()->value == doctest::Appr.ox(0.3));
-        } else {                                             .
+            CHECK(paramObject.value()->name == "Testparameter");
+            CHECK(paramObject.value()->min_value == doctest::Approx(0.1));
+            CHECK(paramObject.value()->max_value == doctest::Approx(1.2));
+            CHECK(paramObject.value()->default_value == doctest::Approx(0.3));
+            CHECK(paramObject.value()->value == doctest::Approx(0.3));
+        } else {
             REQUIRE(false);
         }
     }

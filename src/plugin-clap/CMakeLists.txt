@@ -4,16 +4,12 @@ add_library(plugin-clap MODULE
   plugin_clap.cpp
   guicoupling.cpp
 )
-target_include_directories(plugin-clap
-    PRIVATE
-        "${CMAKE_SOURCE_DIR}/src/gui"
-)
 set_target_properties(plugin-clap PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_ARGS}" SUFFIX ".clap" PREFIX "")
 
 target_include_directories(plugin-clap PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(plugin-clap
   PRIVATE
-    adapters
+    core
     gui
 
     clap

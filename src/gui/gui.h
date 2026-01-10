@@ -3,7 +3,8 @@
 
 #include "Lato-Regular.h"
 
-#include "parameter.h"
+// #include "parameter.h"
+#include "IParameterView.h"
 
 #include <visage/app.h>
 #include <visage/widgets.h>

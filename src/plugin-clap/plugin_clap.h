@@ -2,14 +2,15 @@
 #define PLUGIN_CLAP_H
 
 #include "gui.h"
-#include "parameter.h"
+#include "IParameterView.h"
+#include "ParameterList.h"
 
 #include <clap/helpers/plugin.hh>
 #include <clap/helpers/plugin.hxx>
 
-class PlugParamView : public IParameterView<double> {
+class ClapParameterPresenter : public IParameterView<double> {
 public:
-  virtual ~PlugParamView() = default;
+  virtual ~ClapParameterPresenter() = default;
 
   void setView(const double& v) override {
     displayValue = v;
@@ -73,8 +74,8 @@ private:
   void setPluginDimensions(int width, int height);
 
   std::unique_ptr<MyGui> app_;
-  std::vector<ParameterModel<double>> parameters;
-  std::vector<std::unique_ptr<PlugParamView>> paramviews;
+  std::unique_ptr<ParameterList<double>> parameters;
+  std::unordered_map<unsigned int, std::unique_ptr<ClapParameterPresenter>> parameterPresenters;
 };
 
 #endif // PLUGIN_CLAP_H
