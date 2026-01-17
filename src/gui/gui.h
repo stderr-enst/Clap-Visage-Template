@@ -3,18 +3,17 @@
 
 #include "Lato-Regular.h"
 
-// #include "parameter.h"
 #include "IParameterView.h"
 
 #include <visage/app.h>
 #include <visage/widgets.h>
 
+#include <iomanip>
 #include <string>
 #include <sstream>
 
 using namespace visage::dimension;
 
-// Some GUI tests
 VISAGE_THEME_COLOR(TextColor, 0xffffffff);
 VISAGE_THEME_COLOR(ShapeColor, 0xff237757);
 VISAGE_THEME_COLOR(LabelColor, 0x44212529);
